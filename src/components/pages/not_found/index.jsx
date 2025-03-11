@@ -1,10 +1,12 @@
 import { Link } from "react-router";
+import { Container, Title } from "./styles";
+
 export const NotFound = () => {
   return (
-    <div>
-      Not found
+    <Container>
+      <Title>Not found</Title>
       <br />
       <Link to="/">Return to Home Page</Link>
-    </div>
+    </Container>
   );
 };
