@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-export const NotFound = () => {
+export function NotFound() {
   return (
     <div>
       Not found
@@ -7,4 +7,4 @@ export const NotFound = () => {
       <Link to="/">Return to Home Page</Link>
     </div>
   );
-};
+}
