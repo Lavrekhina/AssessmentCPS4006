@@ -1,4 +1,13 @@
 import { useState } from "react";
+import {
+  Card,
+  Container,
+  Title,
+  Input,
+  Button,
+  Result,
+  Header,
+} from "../not_found/styles";
 
 export const Home = () => {
   const [height, setHeight] = useState(0);
@@ -11,31 +20,29 @@ export const Home = () => {
   };
 
   const calculateBodyIndex = (weight, height) => {
-    return (weight / Math.pow(height / 100, 2)).toPrecision(4);
+    return (weight / Math.pow(height / 100, 2)).toFixed(2);
   };
 
   return (
-    <div>
-      <h1>Home page</h1>
-      <div>
-        <div>
-          <input
-            placeholder="Enter your height"
-            type="number"
-            value={height}
-            onChange={handleHeightChange}
-          />
-        </div>
-        <div>
-          <input
-            placeholder="Enter your weight"
-            type="number"
-            value={weight}
-            onChange={handleWeightChange}
-          />
-        </div>
-        <div>Your BMI: {calculateBodyIndex(weight, height)}</div>
-      </div>
-    </div>
+    <Container>
+      <Header>Home Page</Header>
+      <Card>
+        <Title>BMI Calculator</Title>
+        <Input
+          placeholder="Enter your height in cm"
+          type="number"
+          value={height}
+          onChange={handleHeightChange}
+        />
+        <Input
+          placeholder="Enter your weight in kg"
+          type="number"
+          value={weight}
+          onChange={handleWeightChange}
+        />
+        <Button>Calculate BMI</Button>
+        <Result>Your BMI: {calculateBodyIndex(weight, height)}</Result>
+      </Card>
+    </Container>
   );
 };
