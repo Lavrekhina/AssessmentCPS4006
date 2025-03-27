@@ -7,8 +7,9 @@ export const HEADER_HEIGHT = 60;
 export const Container = styled.div``;
 
 export const Wrap = styled.div`
-max-width: 1200px;
+max-width: 1000px;
 margin: 0 auto;
+padding: 0 20px;
 `;
 
 export const Header = styled.header`
@@ -54,6 +55,7 @@ display: none;
 
 export const Content = styled.main`
 margin-top: ${HEADER_HEIGHT}px;
+padding-top: 20px;
 
 `;
 
