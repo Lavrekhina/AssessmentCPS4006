@@ -12,7 +12,8 @@ import ListItem from "@mui/joy/ListItem";
 import logoIMG from "./images/logo.jpg";
 import IconButton from "@mui/joy/IconButton";
 import MoreVert from "@mui/icons-material/MoreVert";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../../contexts/user";
 
 const links = [
   ["/", "Home"],
@@ -65,6 +66,7 @@ const Burger = () => {
 };
 
 export const LayoutMain = ({ children }) => {
+  const { userName } = useContext(UserContext);
   return (
     <styles.Container>
       <styles.Header>
@@ -77,6 +79,7 @@ export const LayoutMain = ({ children }) => {
             <styles.HeaderBurger>
               <Burger />
             </styles.HeaderBurger>
+            {userName}
           </styles.HeaderWrap>
         </styles.Wrap>
       </styles.Header>

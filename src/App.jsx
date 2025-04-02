@@ -11,31 +11,46 @@ import { NotFound } from "./components/pages/not_found";
 import { BrowserRouter, Routes, Route, Link } from "react-router";
 import { LayoutMain } from "./components/layouts/main";
 import "normalize.css";
+import { UserContext } from "./contexts/user";
+import { SignIn } from "./components/pages/signin";
+
+UserContext.Provider;
 
 function App() {
   const [count, setCount] = useState(0);
+  const [userName, setUserName] = useState(null);
+
+  const isUserSignedIn = !!userName;
 
   return (
-    <LayoutMain>
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/symptoms-checker" element={<Symptoms />} />
-          <Route path="/nutritional" element={<Nutrition />} />
-          <Route path="/mental-tools" element={<MentalTools />} />
-          <Route path="/health-conditions/" element={<HealthConditions />} />
-           
-          <Route
-            path="/health-conditions/:conditionId"
-            element={<HealthCondition />}
-          />
-           
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-    </LayoutMain>
+    <UserContext.Provider value={{ userName, setUserName }}>
+      <LayoutMain>
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/news" element={<News />} />
+            <Route
+              path="/profile"
+              element={isUserSignedIn ? <Profile /> : <SignIn />}
+            />
+            <Route path="/symptoms-checker" element={<Symptoms />} />
+            <Route path="/nutritional" element={<Nutrition />} />
+            <Route
+              path="/mental-tools"
+              element={isUserSignedIn ? <MentalTools /> : <SignIn />}
+            />
+            <Route path="/health-conditions/" element={<HealthConditions />} />
+             
+            <Route
+              path="/health-conditions/:conditionId"
+              element={<HealthCondition />}
+            />
+             
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </LayoutMain>
+    </UserContext.Provider>
   );
 }
 
