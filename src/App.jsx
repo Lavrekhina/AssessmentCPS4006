@@ -6,52 +6,47 @@ import { Symptoms } from "./components/pages/symptoms";
 import { Nutrition } from "./components/pages/nutritional";
 import { MentalTools } from "./components/pages/mental-tools";
 import { HealthConditions } from "./components/pages/health-conditions";
-import { HealthCondition } from "./components/pages/health-condition";
 import { NotFound } from "./components/pages/not_found";
-import { BrowserRouter, Routes, Route, Link } from "react-router";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { LayoutMain } from "./components/layouts/main";
 import "normalize.css";
 import { UserContext } from "./contexts/user";
 import { SignIn } from "./components/pages/signin";
 
-UserContext.Provider;
+export const App = () => {
+  const [userData, setUserData] = useState({
+    fullName: "",
+    email: "",
+    age: "",
+  });
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [userName, setUserName] = useState(null);
-
-  const isUserSignedIn = !!userName;
+  const isUserSignedIn = !!userData.fullName;
 
   return (
-    <UserContext.Provider value={{ userName, setUserName }}>
+    <UserContext.Provider value={{ userData, setUserData }}>
       <LayoutMain>
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/news" element={<News />} />
-            <Route
-              path="/profile"
-              element={isUserSignedIn ? <Profile /> : <SignIn />}
-            />
-            <Route path="/symptoms-checker" element={<Symptoms />} />
-            <Route path="/nutritional" element={<Nutrition />} />
-            <Route
-              path="/mental-tools"
-              element={isUserSignedIn ? <MentalTools /> : <SignIn />}
-            />
-            <Route path="/health-conditions/" element={<HealthConditions />} />
-             
-            <Route
-              path="/health-conditions/:conditionId"
-              element={<HealthCondition />}
-            />
-             
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/symptoms-checker" element={<Symptoms />} />
+          <Route path="/nutritional" element={<Nutrition />} />
+          <Route
+            path="/profile"
+            element={isUserSignedIn ? <Profile /> : <Navigate to="/signin" />}
+          />
+          <Route
+            path="/mental-tools"
+            element={
+              isUserSignedIn ? <MentalTools /> : <Navigate to="/signin" />
+            }
+          />
+          <Route path="/health-conditions" element={<HealthConditions />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </LayoutMain>
     </UserContext.Provider>
   );
-}
+};
 
 export default App;

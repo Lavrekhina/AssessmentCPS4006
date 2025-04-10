@@ -1,6 +1,6 @@
 // import { Link } from "react-router";
 import * as styles from "./styles";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/joy/Link";
 import List from "@mui/joy/List";
 import Menu from "@mui/joy/Menu";
@@ -66,7 +66,7 @@ const Burger = () => {
 };
 
 export const LayoutMain = ({ children }) => {
-  const { userName } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
   return (
     <styles.Container>
       <styles.Header>
@@ -79,7 +79,15 @@ export const LayoutMain = ({ children }) => {
             <styles.HeaderBurger>
               <Burger />
             </styles.HeaderBurger>
-            {userName}
+            {userData?.fullName && (
+              <styles.ProfileContainer>
+                <styles.ProfilePicture
+                  src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                  alt="Profile"
+                />
+                <styles.UserName>{userData.fullName}</styles.UserName>
+              </styles.ProfileContainer>
+            )}
           </styles.HeaderWrap>
         </styles.Wrap>
       </styles.Header>

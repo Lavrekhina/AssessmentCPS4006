@@ -10,3 +10,20 @@ min-height: 500px;
 export const Wrap = styled.div`
 max-width: 500px;
 `
+
+export const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  > span {
+    font-size: 14px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
