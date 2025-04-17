@@ -12,12 +12,15 @@ import {
   Select,
   Option,
 } from "@mui/joy";
+import gptService from "../../../utils/services/gptService";
+import { Block } from "@mui/icons-material";
 
 export const Symptoms = () => {
   const [symptom, setSymptom] = useState("");
   const [severity, setSeverity] = useState("");
   const [notes, setNotes] = useState("");
   const [symptomsList, setSymptomsList] = useState([]);
+  const [suggestion, setSuggestion] = useState("");
 
   const handleAddSymptom = () => {
     if (symptom && severity) {
@@ -47,6 +50,16 @@ export const Symptoms = () => {
     "Nausea",
     "Dizziness",
   ];
+
+  const makeSuggestion = async () => {
+    console.log(symptomsList);
+    const response = await gptService.suggest(
+      symptomsList.map((S) => {
+        return `${S.symptom} severity:${S.severity} netes:${S.notes}`;
+      })
+    );
+    setSuggestion(response.choices[0].message.content);
+  };
 
   return (
     <Stack spacing={3}>
@@ -137,6 +150,22 @@ export const Symptoms = () => {
             </Typography>
           )}
         </List>
+      </Card>
+
+      <Card>
+        <Typography level="h2" sx={{ mb: 2 }}>
+          Suggestion for your symptom
+        </Typography>
+        <Stack>
+          <List>
+            <ListItem>
+              <ListItemContent>
+                <Typography level="body2">{suggestion}</Typography>
+              </ListItemContent>
+            </ListItem>
+          </List>
+          <Button onClick={makeSuggestion}>Make Suggestion </Button>
+        </Stack>
       </Card>
     </Stack>
   );

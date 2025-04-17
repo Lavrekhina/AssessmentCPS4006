@@ -17,3 +17,10 @@ export const Item = styled.li`
 list-style: none;
 margin-bottom: 20px;
 `
+
+export const Cover = styled.img`
+    list-style: none;
+    object-fit: cover;
+    max-height: 250px;
+    margin-bottom: 20px;
+`
