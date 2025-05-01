@@ -5,9 +5,7 @@ const API_KEY =
 const BASE_URL = "https://api.openai.com/v1/chat";
 
 if (!API_KEY) {
-  console.error(
-    "API_KEY не определен. Пожалуйста, добавьте VITE_NEWS_API_KEY в файл .env"
-  );
+  console.error('API_KEY not defined');
 }
 
 const gptService = {
@@ -35,7 +33,35 @@ const gptService = {
 
       return response.data;
     } catch (error) {
-      console.error("Ошибка при получении новостей:", error);
+      console.error("Error suggesting:", error);
+      throw error;
+    }
+  },
+
+  suggestNutritional: async (data ) => {
+    try {
+      const response = await axios.post(
+          `${BASE_URL}/completions`,
+          {
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "system",
+                content: "Nutritional consultant, nutritional tips, output in JSON Array format only string, without objects",
+              },
+              {
+                role: "user",
+                content: `Read the the next information about nutritional analyze ${data} and suggest some tips, 
+                answer in json array format`,
+              },
+            ],
+          },
+          { headers: { Authorization: "Bearer " + API_KEY } }
+      );
+
+      return response.data.choices[0].message.content;
+    } catch (error) {
+      console.error("Error suggesting:", error);
       throw error;
     }
   },

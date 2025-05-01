@@ -4,7 +4,7 @@ const API_KEY = 'pub_81116934ff8b312a770b87febf96f6978fb87';
 const BASE_URL = 'https://newsdata.io/api/1';
 
 if (!API_KEY) {
-    console.error('API_KEY не определен. Пожалуйста, добавьте VITE_NEWS_API_KEY в файл .env');
+    console.error('API_KEY not defined');
 }
 
 const newsService = {
@@ -19,7 +19,7 @@ const newsService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Ошибка при получении новостей:', error);
+            console.error('News fetching error:', error);
             throw error;
         }
     }

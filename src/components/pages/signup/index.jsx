@@ -1,9 +1,8 @@
 import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import SvgIcon from "@mui/material/SvgIcon";
-
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import * as style from "./styles";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -20,12 +19,15 @@ import { UserContext } from "../../../contexts/user";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/joy/Typography";
 import Link from "@mui/joy/Link";
-import { ErrorBanner } from "./styles.js";
 import { useAuth } from "../../../contexts/AuthContext.jsx";
+import { ErrorBanner } from "./styles";
+import SvgIcon from "@mui/material/SvgIcon";
 
-export const ErrorMessage = ({ error }) => {
+const ErrorMessage = ({ error }) => {
   return error ? (
-    <ErrorBanner className="text-red-500 text-sm">{error.message}</ErrorBanner>
+    <ErrorBanner className="text-red-500 text-sm bg-blur border-b">
+      {error.message}
+    </ErrorBanner>
   ) : null;
 };
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -46,8 +48,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
       "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
   }),
 }));
-
-const SignInContainer = styled(Stack)(({ theme }) => ({
+const SignUpContainer = styled(Stack)(({ theme }) => ({
   height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
   minHeight: "100%",
   padding: theme.spacing(2),
@@ -70,7 +71,15 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
+// Yup validation schema
 const schema = Yup.object().shape({
+  fullName: Yup.string()
+    .min(3, "Full Name must be at least 3 characters long")
+    .required("Full Name is required"),
+  age: Yup.number()
+    .min(18, "Age must be between 18 and 100")
+    .max(100, "Age must be between 18 and 100")
+    .required("Age is required"),
   email: Yup.string()
     .email("Invalid email format")
     .required("Email is required"),
@@ -79,11 +88,11 @@ const schema = Yup.object().shape({
     .required("Password is required"),
 });
 
-export const SignIn = () => {
-  const navigate = useNavigate();
+export const SignUp = () => {
+  const { signup } = useAuth();
   const [error, setError] = useState(undefined);
-  const { login } = useAuth();
 
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -94,15 +103,16 @@ export const SignIn = () => {
 
   const onSubmit = (data) => {
     try {
-      login(data);
+      signup(data);
       navigate("/profile");
-    } catch (e) {
-      setError(e);
+    } catch (error) {
+      console.log(error);
+      setError(error);
     }
   };
 
   return (
-    <SignInContainer direction="column" justifyContent="space-between">
+    <SignUpContainer direction="column" justifyContent="space-between">
       <Card variant="outlined">
         <ErrorMessage error={error}></ErrorMessage>
         <SvgIcon sx={{ height: 21, width: 100 }}>
@@ -156,7 +166,7 @@ export const SignIn = () => {
           variant="h4"
           sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
         >
-          Sign in
+          Sign Up
         </Typography>
         <Box
           component="form"
@@ -170,8 +180,31 @@ export const SignIn = () => {
           }}
         >
           <FormControl>
+            <FormLabel htmlFor="fullName">Full name</FormLabel>
+            <TextField
+              id="fullName"
+              error={!!errors.fullName}
+              helperText={errors.fullName?.message}
+              type="string"
+              placeholder="Enter your Full Name"
+              {...register("fullName")}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="age">Age</FormLabel>
+            <TextField
+              id="age"
+              error={!!errors.age}
+              helperText={errors.age?.message}
+              type="number"
+              placeholder="Enter your age"
+              {...register("age")}
+            />
+          </FormControl>
+          <FormControl>
             <FormLabel htmlFor="email">Email</FormLabel>
             <TextField
+              id="email"
               error={!!errors.email}
               helperText={errors.email?.message}
               type="email"
@@ -182,6 +215,7 @@ export const SignIn = () => {
           <FormControl>
             <FormLabel htmlFor="password">Password</FormLabel>
             <TextField
+              id="password"
               error={!!errors.password}
               helperText={errors.password?.message}
               type="password"
@@ -194,18 +228,18 @@ export const SignIn = () => {
             label="Remember me"
           />
           <Button type="submit" fullWidth variant="contained">
-            Sign in
+            Sign Up
           </Button>
           <Divider>or</Divider>
 
           <Typography sx={{ textAlign: "center" }}>
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" variant="body2" sx={{ alignSelf: "center" }}>
-              Sign up
+            Have an account?{" "}
+            <Link href="/signin" variant="body2" sx={{ alignSelf: "center" }}>
+              Sign in
             </Link>
           </Typography>
         </Box>
       </Card>
-    </SignInContainer>
+    </SignUpContainer>
   );
 };
