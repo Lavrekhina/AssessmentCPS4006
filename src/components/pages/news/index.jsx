@@ -9,8 +9,8 @@ import Card from "@mui/joy/Card";
 import {Link as RouterLink} from "react-router";
 import Link from "@mui/joy/Link";
 import newsService from "../../../utils/services/newsService";
-import {NEWS_CATEGORIES, SUPPORTED_LANGUAGES} from "../../../utils/constants/apiConstants";
-import {Image} from "@mui/icons-material";
+import {NEWS_CATEGORIES} from "../../../utils/constants/apiConstants";
+import { Container } from '../../ui/container';
 
 export const News = () => {
     const [news, setNews] = useState([]);
@@ -18,6 +18,7 @@ export const News = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(NEWS_CATEGORIES.Wellness);
+
     const fetchNews = async () => {
         try {
             setLoading(true);
@@ -39,7 +40,6 @@ export const News = () => {
         fetchNews()
     }, [selectedCategory]);
 
-
     if (loading) {
         return <Typography>News fetching...</Typography>;
     }
@@ -49,22 +49,24 @@ export const News = () => {
     }
 
     return (
-        <div>
-            <Typography level="h1">News</Typography>
+        <Container>
+            <Typography level="h1" sx={{ mb: 3 }}>News</Typography>
             <style.Form onSubmit={fetchNews}>
                 <Input
                     placeholder="Search by keyword"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    sx={{ flex: 1 }}
                 />
                 <Select
                     placeholder="Category"
                     value={selectedCategory}
                     onChange={(_, value) => setSelectedCategory(value)}
+                    sx={{ minWidth: 150 }}
                 >
                     <Option value={NEWS_CATEGORIES.Nutritions}>Nutritions</Option>
                     <Option value={NEWS_CATEGORIES.Fitness}>Fitness</Option>
-                    <Option value={NEWS_CATEGORIES.Wellness}>Welness</Option>
+                    <Option value={NEWS_CATEGORIES.Wellness}>Wellness</Option>
                     <Option value={NEWS_CATEGORIES.MentalHealth}>Mental health</Option>
                     <Option value={NEWS_CATEGORIES.Science}>Medical science</Option>
                 </Select>
@@ -73,26 +75,53 @@ export const News = () => {
             <style.Content>
                 {news.map((article, index) => (
                     <style.Item key={index}>
-                        <Card>
-                            <style.Cover src={article.image_url}></style.Cover>
-                            <Link component={RouterLink} to={article.link} target="_blank">
-                                <Typography level="h2">{article.title}</Typography>
-                            </Link>
-                            <Typography level="body-sm">
-                                {article.pubDate}
-                            </Typography>
-                            <Typography>{article.description}</Typography>
-                            {article.urlToImage && (
-                                <img
-                                    src={article.urlToImage}
-                                    alt={article.title}
-                                    style={{maxWidth: '100%', height: 'auto', marginTop: '1rem'}}
-                                />
-                            )}
+                        <Card 
+                            variant="outlined"
+                            sx={{
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                '&:hover': {
+                                    boxShadow: 'md',
+                                    transform: 'translateY(-2px)',
+                                    transition: 'all 0.2s ease-in-out'
+                                }
+                            }}
+                        >
+                            <style.Cover src={article.image_url} alt={article.title} />
+                            <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 1.5 }}>
+                                <Link 
+                                    component={RouterLink} 
+                                    to={article.link} 
+                                    target="_blank"
+                                    sx={{ 
+                                        textDecoration: 'none',
+                                        '&:hover': { textDecoration: 'none' }
+                                    }}
+                                >
+                                    <Typography level="h3" sx={{ mb: 0.5, fontSize: '1.1rem' }}>
+                                        {article.title}
+                                    </Typography>
+                                </Link>
+                                <Typography level="body-sm" sx={{ mb: 0.5, color: 'neutral.500' }}>
+                                    {article.pubDate}
+                                </Typography>
+                                <Typography level="body-md" sx={{ 
+                                    flex: 1,
+                                    fontSize: '0.9rem',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 3,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>
+                                    {article.description}
+                                </Typography>
+                            </Card>
                         </Card>
                     </style.Item>
                 ))}
             </style.Content>
-        </div>
+        </Container>
     );
 };

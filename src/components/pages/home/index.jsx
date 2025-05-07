@@ -12,14 +12,10 @@ import {
   ListItem,
   ListItemContent,
 } from "@mui/joy";
+import { Container } from '../../ui/container';
 
 // Local data for platform features
 const platformFeatures = [
-  {
-    title: "Health Conditions",
-    path: "/health-conditions",
-    description: "Track and manage your health conditions and medications",
-  },
   {
     title: "Mental Tools",
     path: "/mental-tools",
@@ -153,7 +149,7 @@ export const Home = () => {
   };
 
   return (
-    <Stack spacing={3}>
+    <Container spacing={3}>
       <Card>
         <Typography level="h1" sx={{ mb: 2 }}>
           Welcome to St Mary's Health Hub
@@ -266,6 +262,6 @@ export const Home = () => {
           )}
         </Stack>
       </Card>
-    </Stack>
+    </Container>
   );
 };

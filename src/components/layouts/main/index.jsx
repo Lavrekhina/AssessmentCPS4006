@@ -14,6 +14,7 @@ import IconButton from "@mui/joy/IconButton";
 import MoreVert from "@mui/icons-material/MoreVert";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../../contexts/user";
+import { useAuth } from "../../../contexts/AuthContext.jsx";
 
 const links = [
   ["/", "Home"],
@@ -22,7 +23,6 @@ const links = [
   ["/symptoms-checker", "Symptoms"],
   ["/nutritional", "Nutrition"],
   ["/mental-tools", "Mental Tools"],
-  ["/health-conditions", "Health Conditions"],
 ];
 
 const Links = ({ orientation }) => {
@@ -66,7 +66,8 @@ const Burger = () => {
 };
 
 export const LayoutMain = ({ children }) => {
-  const { userData } = useContext(UserContext);
+  const { user } = useAuth();
+
   return (
     <styles.Container>
       <styles.Header>
@@ -79,13 +80,13 @@ export const LayoutMain = ({ children }) => {
             <styles.HeaderBurger>
               <Burger />
             </styles.HeaderBurger>
-            {userData?.fullName && (
+            {user?.fullName && (
               <styles.ProfileContainer>
                 <styles.ProfilePicture
                   src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
                   alt="Profile"
                 />
-                <styles.UserName>{userData.fullName}</styles.UserName>
+                <styles.UserName>{user.fullName}</styles.UserName>
               </styles.ProfileContainer>
             )}
           </styles.HeaderWrap>

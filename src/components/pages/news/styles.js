@@ -9,18 +9,29 @@ padding: 10px;
 gap: 10px;
 `
 
-export const Content = styled.ul`
-padding: 0;
+export const Content = styled.div`
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+column-gap: 20px;
+row-gap: 60px;
+padding: 16px 0;
+
+@media (max-width: 1200px) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+  grid-template-columns: 1fr;
+}
 `
 
-export const Item = styled.li`
-list-style: none;
-margin-bottom: 20px;
+export const Item = styled.div`
+height: 100%;
 `
 
 export const Cover = styled.img`
-    list-style: none;
-    object-fit: cover;
-    max-height: 250px;
-    margin-bottom: 20px;
+width: 100%;
+height: 140px;
+object-fit: cover;
+border-radius: 8px 8px 0 0;
 `

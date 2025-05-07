@@ -14,13 +14,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import BarChartIcon from "@mui/icons-material/BarChart";
 
 import IconButton from "@mui/joy/IconButton";
-import {UserContext} from "../../../contexts/user";
 import {notifier} from "../../../utils/notifier";
 import {useAuth} from "../../../contexts/AuthContext.jsx";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import {BarChart} from "@mui/x-charts/BarChart";
 import {useNavigate} from "react-router-dom";
+import {styled} from "@mui/material/styles";
+import { Container } from '../../ui/container';
+
 
 const healthSchema = Yup.object().shape({
     steps: Yup.number().min(0, "Steps value should be positive number"),
@@ -175,7 +177,7 @@ export const Profile = () => {
     }, [healthRecords]);
 
     return (
-        <Stack spacing={3}>
+        <Container spacing={3}>
             <Card>
                 <Stack
                     direction="row"
@@ -239,7 +241,6 @@ export const Profile = () => {
                     </Stack>
                 )}
             </Card>
-
             <Card>
                 <Stack
                     direction="row"
@@ -337,7 +338,6 @@ export const Profile = () => {
                     </div>
                 )}
             </Card>
-
             <Card>
                 <Typography level="h2">Medication Reminders</Typography>
                 <styles.Form onSubmit={handleMedicationSubmit(onMedicationSubmit)}>
@@ -397,6 +397,6 @@ export const Profile = () => {
                     </tbody>
                 </Table>
             </Card>
-        </Stack>
+        </Container>
     );
 };

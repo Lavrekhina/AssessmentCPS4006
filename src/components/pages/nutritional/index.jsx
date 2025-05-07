@@ -3,14 +3,20 @@ import {useMemo, useState} from "react";
 import {Button, Box, Chip, Card, Input, List, ListItem, ListItemContent, Stack, Table, Typography,} from "@mui/joy";
 import nutritionService from "../../../utils/services/nutritionService.js";
 import gptService from "../../../utils/services/gptService.js";
+import {Container} from '../../ui/container';
+import {useAuth} from "../../../contexts/AuthContext.jsx";
 
 export const Nutrition = () => {
+    const {user, updateUser} = useAuth();
     const [mealPlan, setMealPlan] = useState({
         breakfast: "",
         lunch: "",
         dinner: "",
         snacks: "",
+        date: new Date()
     });
+
+    const [mealPlanHistory, setMealPlanHistory] = useState(user.nutritionalRecords ? user.nutritionalRecords : [])
     const [nutritionData, setNutritionData] = useState({});
     const [nutritionTips, setNutritionTips] = useState([]);
 
@@ -23,19 +29,37 @@ export const Nutrition = () => {
 
     const analyzeNutrition = async () => {
         if (mealPlan.breakfast !== '') {
-            nutritionData.breakfast = await nutritionService.analyzeNutrition(`${mealPlan.breakfast}`);
+            nutritionData.breakfast = {
+                ...await nutritionService.analyzeNutrition(`${mealPlan.breakfast}`),
+                ingr: mealPlan.breakfast
+            };
         }
         if (mealPlan.lunch !== '') {
-            nutritionData.lunch = await nutritionService.analyzeNutrition(`${mealPlan.lunch}`);
+            nutritionData.lunch = {
+                ...await nutritionService.analyzeNutrition(`${mealPlan.lunch}`),
+                ingr: mealPlan.lunch
+            };
         }
         if (mealPlan.dinner !== '') {
-            nutritionData.dinner = await nutritionService.analyzeNutrition(`${mealPlan.dinner}`);
+            nutritionData.dinner = {
+                ...await nutritionService.analyzeNutrition(`${mealPlan.dinner}`),
+                ingr: mealPlan.dinner
+            };
         }
         if (mealPlan.snacks !== '') {
-            nutritionData.snacks = await nutritionService.analyzeNutrition(`${mealPlan.snacks}`);
+            nutritionData.snacks = {
+                ...await nutritionService.analyzeNutrition(`${mealPlan.snacks}`),
+                ingr: mealPlan.snacks
+            };
         }
 
         setNutritionData({...nutritionData});
+
+        mealPlanHistory.push(nutritionData)
+        user.nutritionalRecords = mealPlanHistory;
+        updateUser(user);
+
+        setMealPlanHistory(user.nutritionalRecords);
         try {
             let tips = await gptService.suggestNutritional(JSON.stringify(nutritionData));
             if (!tips || tips.length === 0) {
@@ -45,7 +69,6 @@ export const Nutrition = () => {
         } catch (e) {
             console.error(e);
         }
-
     }
 
     const parsedAnalyzeData = useMemo(() => {
@@ -90,7 +113,7 @@ export const Nutrition = () => {
     }, [nutritionData]);
 
     return (
-        <Stack spacing={3}>
+        <Container spacing={3}>
             <Card>
                 <Typography level="h1" sx={{mb: 2}}>
                     Nutrition Guide
@@ -100,7 +123,6 @@ export const Nutrition = () => {
                     maintain a healthy diet.
                 </Typography>
             </Card>
-
             <Card>
                 <Typography level="h2" sx={{mb: 2}}>
                     Daily Meal Plan
@@ -150,6 +172,14 @@ export const Nutrition = () => {
                             value={mealPlan.snacks}
                             onChange={(e) => handleMealPlanChange("snacks", e.target.value)}
                         />
+                    </div>
+
+                    <div>
+                        <Typography level="body2" sx={{mb: 1}}>
+                            Snacks
+                        </Typography>
+                        <Input value={mealPlan.date}
+                               onChange={(e) => handleMealPlanChange("date", e.target.value)} type="date"/>
                     </div>
 
                     <Button onClick={analyzeNutrition} sx={{mt: 2}}>Analyze</Button>
@@ -208,8 +238,6 @@ export const Nutrition = () => {
                     </tbody>
                 </Table>
             </Card> : ''}
-
-
             {nutritionTips.length > 0 ? <Card>
                 <Typography level="h2" sx={{mb: 2}}>
                     Nutrition Tips
@@ -224,8 +252,6 @@ export const Nutrition = () => {
                     ))}
                 </List>
             </Card> : ''}
-
-        </Stack>
-    )
-        ;
+        </Container>
+    );
 };

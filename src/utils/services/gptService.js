@@ -1,11 +1,10 @@
 import axios from "axios";
 
-const API_KEY =
-  "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";
+const API_KEY = "";
 const BASE_URL = "https://api.openai.com/v1/chat";
 
 if (!API_KEY) {
-  console.error('API_KEY not defined');
+  console.error("API_KEY not defined");
 }
 
 const gptService = {
@@ -38,28 +37,59 @@ const gptService = {
     }
   },
 
-  suggestNutritional: async (data ) => {
+  suggestNutritional: async (data) => {
     try {
       const response = await axios.post(
-          `${BASE_URL}/completions`,
-          {
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content: "Nutritional consultant, nutritional tips, output in JSON Array format only string, without objects",
-              },
-              {
-                role: "user",
-                content: `Read the the next information about nutritional analyze ${data} and suggest some tips, 
+        `${BASE_URL}/completions`,
+        {
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content:
+                "Nutritional consultant, nutritional tips, output in JSON Array format only string, without objects",
+            },
+            {
+              role: "user",
+              content: `Read the the next information about nutritional analyze ${data} and suggest some tips, 
                 answer in json array format`,
-              },
-            ],
-          },
-          { headers: { Authorization: "Bearer " + API_KEY } }
+            },
+          ],
+        },
+        { headers: { Authorization: "Bearer " + API_KEY } }
       );
 
       return response.data.choices[0].message.content;
+    } catch (error) {
+      console.error("Error suggesting:", error);
+      throw error;
+    }
+  },
+
+  suggestMental: async (data) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/completions`,
+        {
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a mental wellness coach. Provide personalized mental health recommendations (such as meditation, relaxation, coping strategies). " +
+                "Input is on a 0–4 scale. Provide some links to meditations on youtube if it's required. " +
+                "Output only a JSON array of 3 to 5 string tips, no explanation or objects.",
+            },
+            {
+              role: "user",
+              content: data,
+            },
+          ],
+        },
+        { headers: { Authorization: "Bearer " + API_KEY } }
+      );
+
+      return JSON.parse(response.data.choices[0].message.content);
     } catch (error) {
       console.error("Error suggesting:", error);
       throw error;

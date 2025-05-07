@@ -1,5 +1,5 @@
 // AuthContext.jsx
-import {createContext, useContext, useEffect, useState} from 'react';
+import {createContext, useContext, useState} from 'react';
 
 const AuthContext = createContext();
 
@@ -20,6 +20,9 @@ export const AuthProvider = ({children}) => {
         const newUser = {email, password, age, fullName};
         newUser.healthRecords = [];
         newUser.medicationReminders = [];
+        newUser.symptoms = [];
+        newUser.mentalHealthRecords = [];
+        newUser.nutritionalRecords = [];
 
         users.push(newUser);
         localStorage.setItem('users', JSON.stringify(users));
@@ -31,8 +34,6 @@ export const AuthProvider = ({children}) => {
         localStorage.setItem('user', JSON.stringify(updatedUser));
 
         const users = JSON.parse(localStorage.getItem('users')) || [];
-        console.log(updatedUser)
-        console.log(users)
         let index = users.findIndex(u => u.email === updatedUser.email);
         if (index === -1) {
             users.push(updatedUser);
@@ -43,10 +44,6 @@ export const AuthProvider = ({children}) => {
         users.splice(index, 1);
         users.push(updatedUser);
         localStorage.setItem('users', JSON.stringify(users));
-
-        console.log("UPDATED USER");
-        console.log(updatedUser)
-        console.log(users)
     }
     const login = ({email, password}) => {
         const users = JSON.parse(localStorage.getItem('users')) || [];
