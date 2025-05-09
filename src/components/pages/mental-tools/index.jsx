@@ -37,6 +37,7 @@ const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Very Good'];
 export const MentalTools = () => {
     const {user, updateUser} = useAuth();
 
+    const [suggestionIsLoading, setSuggestionIsLoading] = useState(false);
     const [mentalHistory, setMentalHistory] = useState(user.mentalHealthRecords
         ? user.mentalHealthRecords
         : [])
@@ -75,6 +76,7 @@ export const MentalTools = () => {
         setAnxiety(2);
     }
     const saveMentalState = async () => {
+        setSuggestionIsLoading(true);
         const data = {
             mood: mood,
             energy: energy,
@@ -87,7 +89,7 @@ export const MentalTools = () => {
         user.mentalHealthRecords = mentalHistory;
         updateUser(user);
 
-        setMentalHistory(user.mentalHealthRecords);
+        setMentalHistory([...user.mentalHealthRecords]);
         try {
             const rquest = Object.keys(data).map(key => {
                 return `${key}: ${data[key]}`;
@@ -98,6 +100,7 @@ export const MentalTools = () => {
             console.error(e);
         }
         resetMentalState();
+        setSuggestionIsLoading(false);
     }
 
     const floorToDay = (dateInput) => {
@@ -209,8 +212,6 @@ export const MentalTools = () => {
             }
         ];
     }, [mentalHistory]);
-
-
     return (
         <Container spacing={3}>
             <Card>
@@ -355,12 +356,14 @@ export const MentalTools = () => {
                                 <Typography level="title-lg" sx={{mb: 1}}>
                                     On Date
                                 </Typography>
-                                <Input value={date}
+                                <Input defaultValue={'01/01/2021'}
                                        onChange={(e) => setDate(e.target.value)}
                                        type="date"/>
                             </Box>
 
-                            <Button disabled={!date} onClick={saveMentalState} sx={{mt: 2}}>
+                            <Button disabled={!date || suggestionIsLoading}
+                                    loading={suggestionIsLoading}
+                                    onClick={saveMentalState} sx={{mt: 2}}>
                                 Save state an get Recommendations
                             </Button>
                         </Stack>

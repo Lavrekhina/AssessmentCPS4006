@@ -8,6 +8,7 @@ import {useAuth} from "../../../contexts/AuthContext.jsx";
 
 export const Nutrition = () => {
     const {user, updateUser} = useAuth();
+    const [suggestionLoading,  setSuggestionLoading] = useState(false);
     const [mealPlan, setMealPlan] = useState({
         breakfast: "",
         lunch: "",
@@ -27,7 +28,23 @@ export const Nutrition = () => {
         }));
     };
 
+    const getValueOrEmpty = value =>{
+        if(!value){
+            return "";
+        }
+
+        if(!value.quantity){
+            return "";
+        }
+
+        if(!value.unit){
+            return value.quantity.toFixed(2)
+        }
+
+        return `${value.quantity.toFixed(2)} ${value.unit}`;
+    }
     const analyzeNutrition = async () => {
+        setSuggestionLoading(true);
         if (mealPlan.breakfast !== '') {
             nutritionData.breakfast = {
                 ...await nutritionService.analyzeNutrition(`${mealPlan.breakfast}`),
@@ -69,6 +86,8 @@ export const Nutrition = () => {
         } catch (e) {
             console.error(e);
         }
+
+        setSuggestionLoading(false);
     }
 
     const parsedAnalyzeData = useMemo(() => {
@@ -176,13 +195,15 @@ export const Nutrition = () => {
 
                     <div>
                         <Typography level="body2" sx={{mb: 1}}>
-                            Snacks
+                            On Date
                         </Typography>
                         <Input value={mealPlan.date}
                                onChange={(e) => handleMealPlanChange("date", e.target.value)} type="date"/>
                     </div>
 
-                    <Button onClick={analyzeNutrition} sx={{mt: 2}}>Analyze</Button>
+                    <Button onClick={analyzeNutrition}
+                            loading={suggestionLoading}
+                            sx={{mt: 2}}>Analyze</Button>
 
                 </Stack>
             </Card>
@@ -229,10 +250,10 @@ export const Nutrition = () => {
                     {parsedAnalyzeData.map((item, index) => (
                         <tr key={index}>
                             <td>{item.label}</td>
-                            <td>{item.info.ENERC_KCAL?.quantity?.toFixed(2) + +' ' + item.info.ENERC_KCAL?.unit}</td>
-                            <td>{item.info.FAT?.quantity?.toFixed(2) + ' ' + item.info.FAT?.unit}</td>
-                            <td>{item.info.SUGAR?.quantity?.toFixed(2) + ' ' + item.info.SUGAR?.unit}</td>
-                            <td>{item.info.PROCNT?.quantity?.toFixed(2) + ' ' + item.info.PROCNT?.unit}</td>
+                            <td>{getValueOrEmpty(item.info.ENERC_KCAL)}</td>
+                            <td>{getValueOrEmpty(item.info.FAT)}</td>
+                            <td>{getValueOrEmpty(item.info.SUGAR)}</td>
+                            <td>{getValueOrEmpty(item.info.PROCNT)}</td>
                         </tr>
                     ))}
                     </tbody>

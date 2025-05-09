@@ -1,11 +1,10 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {
     Typography,
     Card,
     Stack,
     Input,
     Button,
-    Divider,
     List,
     ListItem,
     ListItemContent,
@@ -19,11 +18,26 @@ import {useAuth} from "../../../contexts/AuthContext.jsx";
 export const Symptoms = () => {
     const {user, updateUser} = useAuth();
 
+    const [symptomError, setSymptomError] = useState('');
+    const [severityError, setSeverityError] = useState('');
+    const [notesError, setNotesError] = useState('');
+
+    const [suggestionLoading, setSuggestionLoading] = useState(false);
     const [symptom, setSymptom] = useState("");
     const [severity, setSeverity] = useState("");
     const [notes, setNotes] = useState("");
     const [symptomsList, setSymptomsList] = useState(!user.symptoms ? [] : user.symptoms);
     const [suggestion, setSuggestion] = useState("");
+    const commonSymptoms = [
+        "Headache",
+        "Fever",
+        "Cough",
+        "Fatigue",
+        "Muscle pain",
+        "Shortness of breath",
+        "Nausea",
+        "Dizziness",
+    ];
 
     const handleAddSymptom = () => {
         if (!severity || !symptom || !notes) {
@@ -36,6 +50,7 @@ export const Symptoms = () => {
             severity,
             notes,
             suggestion: '',
+            loading: false,
             date: new Date().toLocaleDateString(),
         }
 
@@ -49,37 +64,56 @@ export const Symptoms = () => {
         setSeverity("");
         setNotes("");
     };
-
-    const commonSymptoms = [
-        "Headache",
-        "Fever",
-        "Cough",
-        "Fatigue",
-        "Muscle pain",
-        "Shortness of breath",
-        "Nausea",
-        "Dizziness",
-    ];
-
     const makeSuggestion = async () => {
+        setSuggestionLoading(true);
         const response = await gptService.suggest(
             symptomsList.map((S) => {
                 return `${S.symptom} severity:${S.severity} notes:${S.notes}`;
             })
         );
         setSuggestion(response.choices[0].message.content);
+        setSuggestionLoading(false);
     };
-
     const makeSuggestionFor = async (item) => {
+        item.loading = true;
+
         const response = await gptService.suggest(
             [`${item.symptom} severity:${item.severity} notes:${item.notes}`]
         );
 
         item.suggestion = response.choices[0].message.content;
         user.symptoms = symptomsList;
-        updateUser(user);
-    };
 
+        setSymptomsList([...user.symptoms]);
+        updateUser(user);
+        item.loading = false;
+    };
+    const formValid = useMemo(() => {
+        let valid = true;
+        if (!symptom) {
+            setSymptomError('Field is required');
+            valid = false;
+        }else{
+            setSymptomError('')
+        }
+
+        if (!severity) {
+            setSeverityError('Field is required');
+            valid = false;
+        }else{
+            setSeverityError('')
+        }
+
+        if (!notes) {
+            setNotesError('Field is required');
+            valid = false;
+        }else{
+            setNotesError('')
+        }
+
+        console.log('is valid' + ' ' + valid)
+        return valid;
+    }, [symptom, severity, notes]);
     return (
         <Container spacing={3}>
             <Card>
@@ -103,6 +137,7 @@ export const Symptoms = () => {
                         <Select
                             placeholder="Select a symptom"
                             value={symptom}
+                            color={symptomError ? 'danger' : 'neutral'}
                             onChange={(_, value) => setSymptom(value)}
                         >
                             {commonSymptoms.map((symptom) => (
@@ -119,6 +154,7 @@ export const Symptoms = () => {
                         </Typography>
                         <Select
                             placeholder="Select severity level"
+                            color={severityError ? 'danger' : 'neutral'}
                             value={severity}
                             onChange={(_, value) => setSeverity(value)}
                         >
@@ -135,11 +171,12 @@ export const Symptoms = () => {
                         <Input
                             placeholder="Add any additional details about your symptom"
                             value={notes}
+                            error={notesError}
                             onChange={(e) => setNotes(e.target.value)}
                         />
                     </div>
 
-                    <Button onClick={handleAddSymptom} sx={{mt: 2}}>
+                    <Button onClick={handleAddSymptom} sx={{mt: 2}} disabled={!formValid}>
                         Add Symptom
                     </Button>
                 </Stack>
@@ -152,7 +189,7 @@ export const Symptoms = () => {
                 <List>
                     {symptomsList.map((item) => (
                         <ListItem key={item.id} xs={{marginBottom: '15px'}}>
-                            <ListItemContent >
+                            <ListItemContent>
                                 <Box sx={{
                                     display: 'flex',
                                     flexDirection: 'row',
@@ -161,7 +198,13 @@ export const Symptoms = () => {
                                     justifyContent: 'space-between',
                                     alignItems: 'start'
                                 }}>
-                                    <Box sx={{display: 'flex', justifyItems: 'start',flexDirection: 'column', gap: 1, alignItems: 'start'}}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyItems: 'start',
+                                        flexDirection: 'column',
+                                        gap: 1,
+                                        alignItems: 'start'
+                                    }}>
                                         <Typography level="title-md">
                                             {item.symptom} - {item.severity}
                                         </Typography>
@@ -180,7 +223,14 @@ export const Symptoms = () => {
                                         alignItems: 'center'
                                     }}>
                                         <Typography level="body2">{item.suggestion}</Typography>
-                                        <Button onClick={() => makeSuggestionFor(item)}>Make Suggestion </Button>
+
+                                        {!item.suggestion ? (
+                                            <Button loading={item.loading}
+
+                                                    onClick={() => makeSuggestionFor(item)}>Make
+                                                Suggestion </Button>
+                                        ) : (<div></div>)}
+
                                     </Box>
                                 </Box>
 
@@ -194,7 +244,6 @@ export const Symptoms = () => {
                     )}
                 </List>
             </Card>
-
             <Card>
                 <Typography level="h2" sx={{mb: 2}}>
                     Suggestion for your symptom
@@ -207,7 +256,8 @@ export const Symptoms = () => {
                             </ListItemContent>
                         </ListItem>
                     </List>
-                    <Button onClick={makeSuggestion}>Make Suggestion </Button>
+                    <Button disabled={!symptomsList || symptomsList.length === 0} loading={suggestionLoading} onClick={makeSuggestion}>Make
+                        Suggestion </Button>
                 </Stack>
             </Card>
         </Container>

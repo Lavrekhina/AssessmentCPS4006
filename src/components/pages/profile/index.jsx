@@ -89,7 +89,7 @@ export const Profile = () => {
         user.healthRecords = healthRecords;
         updateUser(user);
 
-        setHealthRecords(user.healthRecords);
+        setHealthRecords([...user.healthRecords]);
     };
 
     const onMedicationSubmit = (data) => {
